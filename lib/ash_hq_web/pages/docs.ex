@@ -46,20 +46,11 @@ defmodule AshHqWeb.Pages.Docs do
         </div>
       </span>
       <div class="grow w-full flex flex-row max-w-[1800px] justify-between md:space-x-12">
-        <div class="sidebar-container sticky overflow-y-auto overflow-x-hidden shrink-0 top-20 xl:border-r xl:border-b xl:border-base-light-300 xl:dark:border-base-dark-700 lg:pr-2 lg:pt-4">
-          <.live_component
-            module={DocSidebar}
-            id="sidebar"
-            class="hidden xl:block w-80"
-            libraries={@libraries}
-            remove_version={@remove_version}
-            sidebar_data={@sidebar_data}
-          />
-        </div>
+        <%!-- DOM order: main content first for find-in-page (CTRL/CMD+F); flex order restores visual layout (sidebar left, content right) on xl --%>
         <div
           :if={@not_found}
           id="docs-window"
-          class="w-full shrink max-w-6xl prose prose-td:pl-0 bg-white dark:bg-base-dark-850 dark:prose-invert md:pr-8 md:mt-4 px-4 md:px-auto mx-auto overflow-x-auto overflow-y-hidden"
+          class="xl:order-2 w-full shrink max-w-6xl prose prose-td:pl-0 bg-white dark:bg-base-dark-850 dark:prose-invert md:pr-8 md:mt-4 px-4 md:px-auto mx-auto overflow-x-auto overflow-y-hidden"
         >
           <div class="w-full nav-anchor text-black dark:text-white relative py-4 md:py-auto">
             <p>
@@ -76,7 +67,7 @@ defmodule AshHqWeb.Pages.Docs do
           id="docs-window"
           class={
             classes([
-              "w-full shrink max-w-6xl bg-white dark:bg-base-dark-850 md:pr-8 md:mt-4 px-4 md:px-auto mx-auto overflow-x-auto overflow-y-hidden prose prose-td:pl-0 dark:prose-invert"
+              "xl:order-2 w-full shrink max-w-6xl bg-white dark:bg-base-dark-850 md:pr-8 md:mt-4 px-4 md:px-auto mx-auto overflow-x-auto overflow-y-hidden prose prose-td:pl-0 dark:prose-invert"
             ])
           }
         >
@@ -119,8 +110,18 @@ defmodule AshHqWeb.Pages.Docs do
             </div>
           </footer>
         </div>
-        <!-- empty div to preserve flex row spacing -->
-        <div />
+        <div class="xl:order-1 sidebar-container sticky overflow-y-auto overflow-x-hidden shrink-0 top-20 xl:border-r xl:border-b xl:border-base-light-300 xl:dark:border-base-dark-700 lg:pr-2 lg:pt-4">
+          <.live_component
+            module={DocSidebar}
+            id="sidebar"
+            class="hidden xl:block w-80"
+            libraries={@libraries}
+            remove_version={@remove_version}
+            sidebar_data={@sidebar_data}
+          />
+        </div>
+        <%!-- empty div to preserve flex row spacing --%>
+        <div class="xl:order-3" />
       </div>
     </div>
     """

@@ -1,0 +1,146 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-hit-area-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-hit-area-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqHitAreaFixTool",
+      "@type": "Tool",
+      "name": "ashhq-hit-area-fix",
+      "purpose": "Developer workflow tool for improving UI accessibility (hit area) in Phoenix LiveView applications. Analyzes a project to locate small clickable areas, proposes and applies fixes to reach ~44x44px hit area without layout or visible changes, and verifies layout and accessibility.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-hit-area-fix', 'fix hit area for issue #34', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": [
+        "ashhq:Analyzer",
+        "ashhq:Locator",
+        "ashhq:Fixer",
+        "ashhq:Verifier"
+      ],
+      "messageFlow": [
+        "Invoker triggers → Analyzer runs",
+        "Analyzer sends projectStructure → Locator runs",
+        "Locator sends elementLocation → Fixer runs",
+        "Fixer sends fixApplied → Verifier runs",
+        "Verifier sends verificationResult → Invoker"
+      ],
+      "constraints": [
+        "Do not introduce layout shifts",
+        "Do not change visible icon size",
+        "Solution must be suitable for desktop and touch",
+        "Output must be explainable and reviewable as part of a pull request",
+        "Apply fix by editing repo files in place; user reviews and commits via PR"
+      ],
+      "firstUseCase": "ash_hq issue #34: 'Including packages' remove icon has a clickable area that is too small. Target repo: ash_hq. First run should fix that icon."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: analyze → locate → propose/apply → verify",
+      "contains": ["ashhq:Analyzer", "ashhq:Locator", "ashhq:Fixer", "ashhq:Verifier"]
+    },
+    {
+      "@id": "ashhq:Analyzer",
+      "@type": "Actor",
+      "name": "Analyzer",
+      "responsibilities": [
+        "Analyze the Phoenix/LiveView project structure (e.g. lib/*_web, components, templates, assets)",
+        "Produce a project structure summary: key paths, entry points, CSS/utility conventions (e.g. Tailwind)",
+        "Send projectStructure message to Locator"
+      ],
+      "receivesFrom": ["ashhq:AshHqHitAreaFixTool", "Invoker"],
+      "sendsTo": ["ashhq:Locator"],
+      "input": "Trigger + repo path (e.g. workspace root)",
+      "outputMessage": "ashhq:projectStructure",
+      "outputPayload": {
+        "repoPath": "string",
+        "liveViewPaths": "array of paths",
+        "componentPaths": "array of paths",
+        "assetPaths": "array of paths",
+        "cssFramework": "string (e.g. Tailwind)",
+        "conventions": "object or array of notes"
+      }
+    },
+    {
+      "@id": "ashhq:Locator",
+      "@type": "Actor",
+      "name": "Locator",
+      "responsibilities": [
+        "Receive projectStructure from Analyzer",
+        "Find the target UI element (e.g. from issue description: 'Including packages' remove icon, or small hit-area control)",
+        "Identify file path, component or template name, current markup and CSS/classes, and a stable selector",
+        "Send elementLocation message to Fixer"
+      ],
+      "receivesFrom": ["ashhq:Analyzer"],
+      "sendsTo": ["ashhq:Fixer"],
+      "inputMessage": "ashhq:projectStructure",
+      "outputMessage": "ashhq:elementLocation",
+      "outputPayload": {
+        "filePath": "string",
+        "componentName": "string or null",
+        "selector": "string",
+        "currentMarkup": "string or description",
+        "currentClasses": "string or array",
+        "description": "string (e.g. 'remove icon for Including packages')"
+      }
+    },
+    {
+      "@id": "ashhq:Fixer",
+      "@type": "Actor",
+      "name": "Fixer",
+      "responsibilities": [
+        "Receive elementLocation from Locator",
+        "Propose a fix that enlarges clickable area to approximately 44x44px without changing visible layout or icon size (e.g. padding, min-width/min-height, or pseudo-area)",
+        "Apply the fix by editing repo files in place using CSS or utility classes common in Phoenix projects (e.g. Tailwind)",
+        "Send fixApplied message to Verifier"
+      ],
+      "receivesFrom": ["ashhq:Locator"],
+      "sendsTo": ["ashhq:Verifier"],
+      "inputMessage": "ashhq:elementLocation",
+      "outputMessage": "ashhq:fixApplied",
+      "outputPayload": {
+        "changedFiles": "array of file paths",
+        "patchSummary": "string",
+        "rationale": "string",
+        "snippet": "string or code block"
+      }
+    },
+    {
+      "@id": "ashhq:Verifier",
+      "@type": "Actor",
+      "name": "Verifier",
+      "responsibilities": [
+        "Receive fixApplied from Fixer (and optionally elementLocation for context)",
+        "Verify that layout is unchanged (no layout shift)",
+        "Verify that accessibility is improved: keyboard focus and screen reader labeling",
+        "Produce verificationResult with pass/fail per criterion, checklist, and any follow-up suggestions",
+        "Send verificationResult to Invoker"
+      ],
+      "receivesFrom": ["ashhq:Fixer"],
+      "sendsTo": ["Invoker"],
+      "inputMessage": "ashhq:fixApplied",
+      "outputMessage": "ashhq:verificationResult",
+      "outputPayload": {
+        "layoutUnchanged": "boolean",
+        "keyboardFocusImproved": "boolean",
+        "screenReaderImproved": "boolean",
+        "checklist": "array of { criterion, passed }",
+        "suggestions": "array of strings"
+      }
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria Verifier must check",
+      "criteria": [
+        "Layout unchanged: no visual shift, no change to visible icon size",
+        "Hit area approximately 44x44px (or equivalent touch target)",
+        "Keyboard focus: element is focusable and focus visible",
+        "Screen reader: element has appropriate label or aria-label"
+      ]
+    }
+  ]
+}

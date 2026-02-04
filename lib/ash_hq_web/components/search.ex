@@ -37,10 +37,12 @@ defmodule AshHqWeb.Components.Search do
           <div class="p-6 h-full grid gap-6 grid-rows-[max-content_auto_max-content]">
             <button
               id="close-search"
-              class="absolute top-6 right-6 h-6 w-6 cursor-pointer z-10 hover:text-base-light-400"
+              type="button"
+              aria-label="Close search"
+              class="absolute top-6 right-6 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer z-10 hover:text-base-light-400 focus:outline-none focus:ring-2 focus:ring-primary-light-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-base-dark-850 rounded"
               phx-click={@close}
             >
-              <span class="hero-x-mark h-6 w-6" />
+              <span class="hero-x-mark h-6 w-6" aria-hidden="true" />
             </button>
             <div class="flex flex-col w-full sticky">
               <div class="w-full flex flex-row justify-start top-0">

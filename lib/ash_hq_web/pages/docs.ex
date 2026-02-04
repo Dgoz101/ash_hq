@@ -73,9 +73,14 @@ defmodule AshHqWeb.Pages.Docs do
         >
           <div
             id="module-docs"
-            class="w-full nav-anchor text-black dark:text-white relative py-4 md:py-auto"
+            class="w-full nav-anchor text-black dark:text-white py-4 md:py-auto flex flex-row flex-wrap items-start gap-x-4 gap-y-2"
           >
-            <div class="flex flex-col float-right">
+            <div class="min-w-0 flex-1 break-words">
+              <%= if @docs do %>
+                <.docs docs={@docs} />
+              <% end %>
+            </div>
+            <div class="flex flex-col flex-shrink-0">
               <.github_guide_link
                 :if={@guide}
                 guide={@guide}
@@ -89,9 +94,6 @@ defmodule AshHqWeb.Pages.Docs do
                 library_version={@library_version}
               />
             </div>
-            <%= if @docs do %>
-              <.docs docs={@docs} />
-            <% end %>
           </div>
 
           <footer class="p-2 sm:justify-center">

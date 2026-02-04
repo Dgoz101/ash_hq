@@ -1,0 +1,73 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-docs-sidebar-dom-order-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-docs-sidebar-dom-order-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqDocsSidebarDomOrderFixTool",
+      "@type": "Tool",
+      "name": "ashhq-docs-sidebar-dom-order-fix",
+      "purpose": "Developer workflow tool for improving in-page search usability on documentation pages in Phoenix LiveView applications. Analyzes the docs layout and how the sidebar and main content are rendered, locates where the sidebar markup is inserted relative to main content in the DOM, proposes (but does not apply unless approved) a fix that keeps the visual layout the same while changing DOM order so main content comes before sidebar for find-in-page usability, and verifies conceptually that layout, keyboard navigation, and a11y semantics are preserved.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-docs-sidebar-dom-order-fix', 'fix docs sidebar DOM order', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": [
+        "ashhq:DocsSidebarDomOrderAnalyst"
+      ],
+      "constraints": [
+        "Do not change visible layout",
+        "Do not break keyboard navigation or a11y semantics",
+        "Do not edit repo files unless user explicitly types APPROVE APPLY",
+        "Output must be explainable and reviewable as a pull request",
+        "Propose only at this stage; no repo edits until explicit approval"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-docs-sidebar-dom-order-fix.jsonld",
+        "runbook": "docs/ashhq-docs-sidebar-dom-order-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "firstUseCase": "ash_hq docs: sidebar is placed in markup before main content, making CTRL/CMD+F cumbersome; tool analyzes layout, locates DOM order, proposes DOM reorder + CSS grid/flex ordering so main content comes first for find-in-page, verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Analyze → Locate → Propose → Verify (one actor, four phased responsibilities)",
+      "contains": ["ashhq:DocsSidebarDomOrderAnalyst"]
+    },
+    {
+      "@id": "ashhq:DocsSidebarDomOrderAnalyst",
+      "@type": "Actor",
+      "name": "DocsSidebarDomOrderAnalyst",
+      "responsibilities": [
+        "Phase 1 — Analyze: Analyze the docs layout and how the sidebar and main content are rendered (LiveView, HEEx, components). Produce a layout summary: which modules/templates/components render the sidebar and which render the main doc content, and how they are composed.",
+        "Phase 2 — Locate: Locate where the sidebar markup is inserted relative to the main content in the DOM. Identify the exact DOM order (e.g. sidebar container before main content container in the document) and the file/layout/component boundaries that produce this order.",
+        "Phase 3 — Propose: Propose (but do NOT apply yet) a fix that keeps the visual layout the same while changing DOM order so main content comes before sidebar for find-in-page usability. The proposal must use DOM reorder and CSS grid or flex ordering for visual placement so that CTRL/CMD+F would hit content first. Document the proposed file changes, snippet-level edits, and rationale. Do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 4 — Verify: Verify conceptually (not by editing code yet) that: (1) visual layout would be unchanged, (2) keyboard navigation would be preserved, (3) screen reader semantics would be preserved, (4) CTRL/CMD+F would hit main content first. Produce a short verification checklist and any caveats or follow-up checks."
+      ],
+      "receivesFrom": ["ashhq:AshHqDocsSidebarDomOrderFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq",
+      "outputPayload": {
+        "layoutSummary": "object (sidebar and main content render locations, components, composition)",
+        "domOrderDescription": "string (where sidebar vs main content appear in DOM)",
+        "proposal": "object (proposed DOM reorder, CSS grid/flex ordering, file-level changes, snippets; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 4",
+      "criteria": [
+        "Visual layout unchanged: reorder and CSS ordering preserve on-screen appearance",
+        "Keyboard navigation preserved: tab order and focus behavior unchanged or improved",
+        "Screen reader semantics preserved: landmark/heading order and reading order remain correct",
+        "CTRL/CMD+F hits main content first: main content appears before sidebar in DOM so find-in-page reaches doc content before nav"
+      ]
+    }
+  ]
+}

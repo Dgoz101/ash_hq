@@ -45,12 +45,7 @@ defmodule AshHqWeb.AppViewLive do
       <button id="search-button" class="hidden" phx-click={AshHqWeb.AppViewLive.toggle_search()} />
       <div
         id="main-container"
-        class={
-          classes([
-            "w-full min-h-screen bg-white dark:bg-base-dark-850 dark:text-white flex flex-col items-stretch",
-            "h-screen overflow-y-auto": @live_action != :docs_dsl
-          ])
-        }
+        class="w-full min-h-screen bg-white dark:bg-base-dark-850 dark:text-white flex flex-col items-stretch"
       >
         <TopBar.top_bar live_action={@live_action} configured_theme={@configured_theme} />
         <%= case @live_action do %>

@@ -1,0 +1,90 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-docs-scroll-container-usability-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-docs-scroll-container-usability-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqDocsScrollContainerUsabilityFixTool",
+      "@type": "Tool",
+      "name": "ashhq-docs-scroll-container-usability-fix",
+      "purpose": "Developer workflow tool for fixing a scrolling usability issue on documentation pages in a Phoenix LiveView application. The immediate task: docs content area scrolls inside a narrow container, making scrolling unnecessarily difficult because users must scroll within the content panel instead of scrolling anywhere on the page. The tool analyzes docs page layout and scroll behavior, locates the DOM elements and CSS rules responsible for constrained scrolling (overflow, fixed/absolute heights, flex/grid creating isolated scroll containers, sticky headers/sidebars), reproduces the issue locally with exact steps, proposes (but does not apply unless approved) one or more fixes that improve scroll usability while preserving layout intent and sidebar behavior, and verifies conceptually that full-page or widened scroll works without regressions to layout, keyboard navigation, or accessibility.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-docs-scroll-container-usability-fix', 'fix docs scroll container', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": [
+        "ashhq:DocsScrollContainerAnalyst"
+      ],
+      "constraints": [
+        "Do not significantly change visible layout intent",
+        "Do not break keyboard navigation or accessibility semantics",
+        "Do not edit repository code unless user explicitly types APPROVE APPLY",
+        "Output must be explainable and reviewable as a pull request",
+        "Prefer minimal, localized changes; avoid global CSS unless clearly justified",
+        "Propose only at this stage; no repo edits until explicit approval",
+        "User may commit and push to their fork; do not open upstream PR"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-docs-scroll-container-usability-fix.jsonld",
+        "runbook": "docs/ashhq-docs-scroll-container-usability-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "targetArea": "Documentation pages where main content scrolling is constrained",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "applyBehavior": "PROPOSE ONLY. No repository edits allowed until user explicitly types APPROVE APPLY.",
+      "firstUseCase": "ash_hq docs: content scrolls inside a narrow container; tool analyzes layout/scroll, locates overflow/height/flex/grid and sticky behavior, reproduces narrow-scroll, proposes full-page or widened scroll fix, verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Analyze → Locate → Reproduce → Propose → Verify (one actor, five phased responsibilities)",
+      "contains": ["ashhq:DocsScrollContainerAnalyst"]
+    },
+    {
+      "@id": "ashhq:DocsScrollContainerAnalyst",
+      "@type": "Actor",
+      "name": "DocsScrollContainerAnalyst",
+      "responsibilities": [
+        "Phase 1 — Analyze: Analyze the docs page layout and scroll behavior. Identify which container(s) are scrollable (e.g. overflow-y: auto/scroll). Determine why scrolling is constrained to a narrow content area instead of the full page. Identify how the main content, sidebar(s), and overall page shell are structured (LiveView, HEEx, components, Tailwind). Produce a layout summary: modules/templates/components and their composition.",
+        "Phase 2 — Locate: Locate the specific DOM element(s) and CSS rules responsible for the constrained scrolling: overflow rules, fixed/absolute heights, flex/grid layouts that create isolated scroll containers, and any interaction with sticky headers or sidebars. Record file paths, selectors, and current markup/classes.",
+        "Phase 3 — Reproduce: Identify docs pages where the narrow scroll area is most noticeable. Document exact reproduction steps: URL/route, viewport sizes (e.g. 1024, 1280, 1440), expected vs actual scroll behavior (e.g. 'user expects to scroll anywhere on page; instead only the content column scrolls').",
+        "Phase 4 — Propose: Propose (but do NOT apply yet) one or more fixes that improve scroll usability while preserving layout intent. Preferred: allow scrolling on the main page/body so users can scroll anywhere. Alternative: widen the effective scroll area so scrolling is not limited to a narrow column. Ensure sidebars (left nav, right function list) continue to behave as intended (sticky if needed, but not forcing isolated scroll). Avoid introducing nested scroll containers unless absolutely necessary. Document fix options with tradeoffs. Do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 5 — Verify: Verify conceptually (no code edits yet) that: (1) users can scroll the docs page from anywhere on the page (not just inside a narrow container); (2) no regressions to layout, sticky navigation, or content visibility; (3) keyboard navigation and accessibility semantics remain intact; (4) behavior is consistent across common desktop widths (1024, 1280, 1440) and unchanged on mobile unless intentionally improved. Produce a short verification checklist and any caveats."
+      ],
+      "receivesFrom": ["ashhq:AshHqDocsScrollContainerUsabilityFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq, target area docs pages",
+      "outputPayload": {
+        "layoutSummary": "object (scrollable containers, main content vs sidebars vs shell, LiveView/HEEx/components/Tailwind structure)",
+        "rootCauseLocation": "object (DOM elements, overflow rules, fixed/absolute heights, flex/grid creating scroll containers, sticky interaction; file paths, selectors, current markup/classes)",
+        "reproduction": "object (pages, URL/route, viewport sizes, expected vs actual scroll behavior, exact reproduction steps)",
+        "proposal": "object (fix options with tradeoffs, preferred and alternatives, file-level changes, snippets; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:LocateChecklist",
+      "@type": "Requirement",
+      "purpose": "What to identify when locating the constrained scroll container",
+      "checklist": [
+        "overflow rules (e.g. overflow-y: auto/scroll)",
+        "fixed or absolute heights that constrain scroll region",
+        "flex/grid layouts that create isolated scroll containers",
+        "Interaction with sticky headers or sidebars"
+      ]
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 5",
+      "criteria": [
+        "Users can scroll the docs page from anywhere on the page (not just inside a narrow container)",
+        "No regressions to layout, sticky navigation, or content visibility",
+        "Keyboard navigation and accessibility semantics remain intact",
+        "Behavior consistent across common desktop widths (1024, 1280, 1440) and unchanged on mobile unless intentionally improved"
+      ]
+    }
+  ]
+}

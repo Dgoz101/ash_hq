@@ -35,7 +35,7 @@ defmodule AshHq.Docs.Extensions.RenderMarkdown.PostProcessors.TableOfContentsGen
               [
                 {"href", "##{id}"},
                 {"class",
-                 "text-primary-light-600 dark:text-primary-dark-400 text-ellipsis overflow-hidden block"}
+                 "text-primary-light-600 dark:text-primary-dark-400 text-ellipsis overflow-hidden block transition-colors"}
               ],
               [String.trim(text)]
             }
@@ -99,7 +99,7 @@ defmodule AshHq.Docs.Extensions.RenderMarkdown.PostProcessors.TableOfContentsGen
               [
                 {"href", "##{id}"},
                 {"class",
-                 "text-primary-light-600 dark:text-primary-dark-400 block text-ellipsis overflow-hidden"}
+                 "text-primary-light-600 dark:text-primary-dark-400 block text-ellipsis overflow-hidden transition-colors"}
               ],
               [String.trim(text)]
             }

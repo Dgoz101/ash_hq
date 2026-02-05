@@ -1,0 +1,91 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-right-hand-function-list-anchor-jerk-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-right-hand-function-list-anchor-jerk-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqRightHandFunctionListAnchorJerkFixTool",
+      "@type": "Tool",
+      "name": "ashhq-right-hand-function-list-anchor-jerk-fix",
+      "purpose": "Developer workflow tool for fixing an in-page navigation UX bug on documentation pages in a Phoenix LiveView application. The immediate task: right-hand function list (table of contents) — clicking anchors produces a visible jerk/animated nudge when navigating to a section id. The tool locates where the right-hand function list is rendered, reproduces the jerk, diagnoses root cause (link styles, :target styles, double scroll behavior), proposes one or more minimal-risk fixes (without applying them), and verifies conceptually that the fix would eliminate the jerk while preserving layout, keyboard navigation, and accessibility.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-right-hand-function-list-anchor-jerk-fix', 'fix TOC anchor jerk', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": [
+        "ashhq:AnchorJerkAnalyst"
+      ],
+      "constraints": [
+        "Do not change visible layout intent",
+        "Do not break keyboard navigation or accessibility semantics",
+        "Do not edit repository code unless user explicitly types APPROVE APPLY",
+        "Prefer minimal, localized changes; avoid global CSS unless necessary",
+        "Output must be explainable and reviewable as a pull request",
+        "User may commit and push to their fork; do not open upstream PR",
+        "Propose only at this stage; no repo edits until explicit approval"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-right-hand-function-list-anchor-jerk-fix.jsonld",
+        "runbook": "docs/ashhq-right-hand-function-list-anchor-jerk-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "targetArea": "Documentation pages where the right-hand function list (table of contents) is rendered",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "applyBehavior": "PROPOSE ONLY. No repository edits allowed until user explicitly types APPROVE APPLY.",
+      "firstUseCase": "ash_hq docs: right-hand function list (TOC) — clicking in-page anchors causes visible jerk/nudge; tool locates TOC markup, reproduces, diagnoses (link/:target/scroll), proposes fix, verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Locate → Reproduce → Diagnose → Propose → Verify (one actor, five phased responsibilities)",
+      "contains": ["ashhq:AnchorJerkAnalyst"]
+    },
+    {
+      "@id": "ashhq:AnchorJerkAnalyst",
+      "@type": "Actor",
+      "name": "AnchorJerkAnalyst",
+      "responsibilities": [
+        "Phase 1 — Locate: Locate where the right-hand function list is rendered (LiveView, HEEx, components) and identify the anchor markup and classes used for those links. Identify file path, component or template name, selector, current markup and CSS/utility classes for the TOC links.",
+        "Phase 2 — Reproduce: Identify one or more docs pages where the right-hand function list appears and the jerk is visible. Document exact reproduction steps: URL/route, viewport widths (e.g. 1024, 1280, 1440), and click behavior (click anchor → observe jerk).",
+        "Phase 3 — Diagnose: Inspect the CSS and JS involved to determine root cause. Check: (1) whether the jerk comes from link click styles (active/focus transforms, transition-all, scale/translate on TOC anchors); (2) whether from :target styles on the destination element (transitions on layout-affecting properties); (3) whether from scroll behavior being applied twice (CSS scroll-behavior smooth + JS/LiveView hook scrollIntoView or similar). Identify the smallest set of classes, rules, or hooks responsible.",
+        "Phase 4 — Propose: Propose (but do NOT apply yet) one or more fixes, prioritized by minimal risk: Preferred — remove/limit transforms and transition-all on the function list anchors; use transition-colors instead. Alternative — adjust :target highlight to avoid animating layout (avoid margin/top/transform transitions; use background/outline/box-shadow). Alternative — ensure only one scroll mechanism is used (either CSS smooth scroll OR JS smooth scroll), not both. Document proposed file changes, snippet-level edits, and rationale. Do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 5 — Verify: Verify conceptually (no code edits yet) that: (1) click on function anchors would no longer cause a nudge; scroll would land once; (2) visual styling intent preserved (hover/focus still clear); (3) keyboard navigation remains good (Tab → Enter on a function link works; focus indicator visible); (4) screen reader semantics unchanged; (5) no regressions at common desktop widths (1024, 1280, 1440) and mobile behavior unchanged. Produce a short verification checklist and any caveats."
+      ],
+      "receivesFrom": ["ashhq:AshHqRightHandFunctionListAnchorJerkFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq",
+      "outputPayload": {
+        "location": "object (filePath, componentName, selector, anchorMarkup, anchorClasses, TOC container description)",
+        "reproduction": "object (pages, URL/route, viewport widths, exact reproduction steps)",
+        "diagnosis": "object (rootCause, culpritSet: linkStyles | targetStyles | doubleScroll | combination, smallest set of classes/rules/hooks)",
+        "proposal": "object (fix options with priority, file-level changes, snippets, rationale; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:DiagnosisChecklist",
+      "@type": "Requirement",
+      "purpose": "Root cause diagnosis checklist (what to inspect in CSS/JS)",
+      "checklist": [
+        "Link click styles: active/focus transforms, transition-all, scale/translate on TOC anchors",
+        ":target styles on destination element: transitions on layout-affecting properties (margin, top, transform)",
+        "Scroll behavior: CSS scroll-behavior smooth + JS/LiveView scrollIntoView or similar (double scroll)",
+        "Smallest set: identify the minimal classes, rules, or hooks responsible"
+      ]
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 5",
+      "criteria": [
+        "Click on function anchors no longer causes nudge; scroll lands once",
+        "Visual styling intent preserved (hover/focus still clear)",
+        "Keyboard navigation: Tab → Enter on function link works; focus indicator visible",
+        "Screen reader semantics unchanged",
+        "No regressions at common desktop widths (1024, 1280, 1440) and mobile behavior unchanged"
+      ]
+    }
+  ]
+}

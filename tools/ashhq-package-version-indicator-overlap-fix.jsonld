@@ -1,0 +1,78 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-package-version-indicator-overlap-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-package-version-indicator-overlap-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqPackageVersionIndicatorOverlapFixTool",
+      "@type": "Tool",
+      "name": "ashhq-package-version-indicator-overlap-fix",
+      "purpose": "Developer workflow tool for fixing a layout bug where the package version indicator overlaps headings/content on certain screen sizes and with long top headings in Phoenix LiveView documentation pages. Analyzes the page header layout where the package title and version indicator are rendered, locates the version indicator markup and styling (DOM position, positioning rules, z-index, overflow, container constraints), reproduces the overlap scenario (breakpoint ranges and content conditions), proposes (but does not apply unless approved) a fix that prevents overlap while preserving design intent, and verifies conceptually that layout, keyboard navigation, and a11y semantics are preserved.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-package-version-indicator-overlap-fix', 'fix package version indicator overlap', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": [
+        "ashhq:PackageVersionIndicatorOverlapAnalyst"
+      ],
+      "constraints": [
+        "Do not change visible layout intent",
+        "Do not break keyboard navigation or accessibility semantics",
+        "Do not edit repo files unless user explicitly types APPROVE APPLY",
+        "Output must be explainable and reviewable as a pull request",
+        "Prefer minimal, localized changes; avoid global CSS unless unavoidable",
+        "Propose only at this stage; no repo edits until explicit approval"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-package-version-indicator-overlap-fix.jsonld",
+        "runbook": "docs/ashhq-package-version-indicator-overlap-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "targetArea": "Documentation package header region where the version indicator is displayed",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "firstUseCase": "ash_hq docs: package version indicator overlaps headings/content at certain desktop widths and when the top H1 is long; tool analyzes header layout, locates indicator markup and styling, reproduces overlap, proposes layout-driven or reserved-space fix, verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Analyze → Locate → Reproduce → Propose → Verify (one actor, five phased responsibilities)",
+      "contains": ["ashhq:PackageVersionIndicatorOverlapAnalyst"]
+    },
+    {
+      "@id": "ashhq:PackageVersionIndicatorOverlapAnalyst",
+      "@type": "Actor",
+      "name": "PackageVersionIndicatorOverlapAnalyst",
+      "responsibilities": [
+        "Phase 1 — Analyze: Analyze the page header layout where the package title/heading and version indicator are rendered (LiveView, HEEx, components, Tailwind classes). Produce a layout summary: which modules/templates/components render the header, title, and version indicator, and how they are composed.",
+        "Phase 2 — Locate: Locate the version indicator markup and styling: where it appears in the DOM, what positioning rules apply (relative/absolute, z-index, overflow, padding, container constraints). Identify file path, selector, current markup and classes.",
+        "Phase 3 — Reproduce: Reproduce the overlap scenario without committing fake content: identify one or more desktop breakpoint ranges where overlap occurs, identify the content condition that triggers it (e.g. long heading wrapping), and document clear local reproduction steps (route, browser width, content conditions).",
+        "Phase 4 — Propose: Propose (but do NOT apply yet) a fix that prevents overlap while preserving design intent. Prefer layout-driven solutions (flex/grid header row) so the indicator participates in layout flow; alternatively retain absolute positioning but reliably reserve space (padding/margin/containment) without fragile magic numbers. Ensure long headings wrap safely (min-w-0, break-words, etc.) and the indicator remains aligned and readable. Document fix options with tradeoffs. Do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 5 — Verify: Verify conceptually (not by editing code yet) that: (1) no overlap across common desktop widths (e.g. 1024, 1280, 1440), (2) long headings wrap without going under the indicator, (3) visual layout intent is preserved (indicator still top-right or equivalent), (4) keyboard navigation order remains logical, (5) screen reader semantics are preserved. Produce a short verification checklist and any caveats or follow-up checks."
+      ],
+      "receivesFrom": ["ashhq:AshHqPackageVersionIndicatorOverlapFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq, target area docs package header",
+      "outputPayload": {
+        "layoutSummary": "object (header, title, version indicator render locations, components, composition)",
+        "versionIndicatorLocation": "object (DOM position, positioning rules, z-index, overflow, padding, container constraints, filePath, selector, currentMarkup, currentClasses)",
+        "reproduction": "object (breakpoint ranges, content condition, reproduction steps: route, width, content)",
+        "proposal": "object (fix options with tradeoffs, preferred option, file-level changes, snippets; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 5",
+      "criteria": [
+        "No overlap at common desktop widths (e.g. 1024, 1280, 1440)",
+        "Long headings wrap without going under the version indicator",
+        "Visual layout intent preserved: indicator still appears top-right or equivalent",
+        "Keyboard navigation order remains logical",
+        "Screen reader semantics preserved"
+      ]
+    }
+  ]
+}

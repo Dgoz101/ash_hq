@@ -1,0 +1,89 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-mobile-hamburger-state-indicator-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-mobile-hamburger-state-indicator-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqMobileHamburgerStateIndicatorFixTool",
+      "@type": "Tool",
+      "name": "ashhq-mobile-hamburger-state-indicator-fix",
+      "purpose": "Developer workflow tool for improving mobile navigation usability on documentation pages in a Phoenix LiveView application. The immediate task: the hamburger (menu) icon does not show state — when the docs sidebar is open, the icon does not update to reflect active/open state, making system state ambiguous. The tool analyzes mobile docs navigation behavior, locates how open state is represented (assigns, events, hooks, CSS), reproduces the missing-state issue on mobile, proposes (but does not apply unless approved) one or more fixes to provide clear state feedback (e.g. icon swap hamburger ↔ X, or active styling with contrast), optionally improves ARIA (aria-expanded, aria-controls, aria-label), and verifies conceptually that visual state, assistive tech, keyboard, and layout remain correct with no regressions.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-mobile-hamburger-state-indicator-fix', 'fix hamburger state indicator', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": ["ashhq:HamburgerStateIndicatorAnalyst"],
+      "constraints": [
+        "Do not significantly change visible layout intent outside of mobile",
+        "Do not break keyboard navigation or accessibility semantics",
+        "Do not edit repository code unless user explicitly types APPROVE APPLY",
+        "Prefer minimal, localized changes near the docs mobile header and sidebar toggle",
+        "Output must be explainable and reviewable as a pull request",
+        "User may commit and push to their fork; do not open upstream PR",
+        "Propose only at this stage; no repo edits until explicit approval"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-mobile-hamburger-state-indicator-fix.jsonld",
+        "runbook": "docs/ashhq-mobile-hamburger-state-indicator-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "targetArea": "Docs mobile header / sidebar toggle button",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "applyBehavior": "PROPOSE ONLY. No repository edits allowed until user explicitly types APPROVE APPLY.",
+      "firstUseCase": "ash_hq docs: mobile hamburger icon does not show open/closed state; tool analyzes navigation behavior, locates state (assigns/events/hooks/CSS), reproduces on mobile, proposes icon swap or active styling + optional ARIA, verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Analyze → Locate state → Reproduce → Propose → Verify (one actor, five phased responsibilities)",
+      "contains": ["ashhq:HamburgerStateIndicatorAnalyst"]
+    },
+    {
+      "@id": "ashhq:HamburgerStateIndicatorAnalyst",
+      "@type": "Actor",
+      "name": "HamburgerStateIndicatorAnalyst",
+      "responsibilities": [
+        "Phase 1 — Analyze: Analyze the mobile docs navigation behavior. Identify where the hamburger/menu button is rendered (LiveView, HEEx, components). Identify what it toggles (sidebar open/close) and how state is tracked (assign, LiveView state, JS hook, CSS class toggle). Produce a layout and behavior summary.",
+        "Phase 2 — Locate state: Locate how 'open' state is represented today. Determine whether the sidebar is shown/hidden via assigns, conditional rendering, CSS classes, or JS. Identify any existing state variables, events, or hooks (e.g. show_sidebar, hide_sidebar, sidebar_open?, phx-click, phx-hook). Document file path(s), assign names, event names, and DOM/class behavior.",
+        "Phase 3 — Reproduce: Reproduce the issue on mobile. Document exact steps: docs route, mobile width or device preset. Open and close the sidebar; note that the icon does not visually change, making state ambiguous. Record expected vs actual (expected: button reflects open state; actual: icon unchanged).",
+        "Phase 4 — Propose: Propose (but do NOT apply yet) one or more fixes to provide clear state feedback while preserving design intent. Preferred: toggle the icon between hamburger (closed) and close X (open). Alternative: keep hamburger but add an active visual state (pressed styling, background, border, color) meeting contrast requirements. Optional: update ARIA (aria-expanded, aria-controls, aria-label e.g. 'Open docs menu' vs 'Close docs menu'). Ensure focus styles remain visible and touch target remains accessible (e.g. ~44×44px). Document fix options with tradeoffs; do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 5 — Verify: Verify conceptually (no code edits yet): (1) when sidebar is open, the button clearly indicates open state visually; (2) assistive tech can perceive state via aria-expanded and label reflects action; (3) no regressions to desktop/tablet layouts; (4) keyboard: Tab → Enter/Space toggles, focus remains sensible, Escape behavior (if present) still works; (5) mobile layout remains stable (no shifting/jumping). Produce a short verification checklist and any caveats."
+      ],
+      "receivesFrom": ["ashhq:AshHqMobileHamburgerStateIndicatorFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq, target area docs mobile header / sidebar toggle",
+      "outputPayload": {
+        "layoutSummary": "object (hamburger render location, what it toggles, how state is tracked)",
+        "stateLocation": "object (assigns, events, hooks, CSS/classes, file paths, DOM behavior)",
+        "reproduction": "object (docs route, mobile width/preset, exact steps, expected vs actual)",
+        "proposal": "object (fix options with tradeoffs, preferred option, ARIA notes, file-level/snippet-level changes; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:ProposalRequirements",
+      "@type": "Requirement",
+      "purpose": "Requirements for proposed fixes",
+      "requirements": [
+        "Preferred: toggle icon between hamburger (closed) and close X (open)",
+        "Alternative: keep hamburger, add active visual state (pressed/background/border/color) with contrast requirements met",
+        "Optional: aria-expanded, aria-controls, aria-label (Open docs menu / Close docs menu)",
+        "Focus styles visible; touch target ~44×44px; minimal, localized changes"
+      ]
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 5",
+      "criteria": [
+        "When sidebar is open, button clearly indicates open state visually",
+        "Assistive tech can perceive state via aria-expanded; label reflects action",
+        "No regressions to desktop/tablet layouts",
+        "Keyboard: Tab → Enter/Space toggles; focus sensible; Escape (if present) works",
+        "Mobile layout stable (no shifting/jumping)"
+      ]
+    }
+  ]
+}

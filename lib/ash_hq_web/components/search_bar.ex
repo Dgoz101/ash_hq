@@ -23,6 +23,7 @@ defmodule AshHqWeb.Components.SearchBar do
           <span class="hero-magnifying-glass w-4 h-4" />
           <div>Search Documentation</div>
         </div>
+        
         <div>⌘ + K</div>
       </div>
     </button>

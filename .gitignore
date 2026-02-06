@@ -40,3 +40,5 @@ ash-hq.db*
 /indexes/*
 
 /tmp
+
+/docker-compose.yml

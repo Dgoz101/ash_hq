@@ -1,16 +1,18 @@
 <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
   <div class="absolute inset-0 bg-gradient-to-b from-primary-light-900/20 via-primary-dark-900/10 to-primary-light-900/20">
   </div>
-
+  
   <div class="absolute inset-0 bg-[linear-gradient(rgba(254,19,19,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(254,19,19,0.2)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]">
   </div>
-
+  
   <div class="absolute bottom-0 left-0 right-0 h-[40vh] bg-gradient-to-t to-transparent perspective-grid">
   </div>
+  
   <div class="container sm:mx-auto mt-24 z-10">
     <div class="grid grid-cols-2 gap-4">
       <div class="col-span-2 flex-col flex items-center">
         <div class="text-3xl font-bold mt-8 mb-8 text-center">Ash Weekly Newsletter</div>
+        
         <a
           href="https://ashweekly.substack.com"
           class="flex items-center justify-center px-6 py-3 bg-primary-dark-500 hover:bg-primary-dark-600 text-white rounded-lg shadow-md mb-8 transition-all duration-300 ease-in-out transform hover:scale-105"
@@ -32,8 +34,10 @@
           </svg>
         </a>
       </div>
+      
       <div class="col-span-2 flex-col flex items-center">
         <div class="text-3xl font-bold mt-8 mb-8 text-center">Case Studies & Blog Posts</div>
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
           <a
             :for={post <- @blog_posts_and_case_studies}
@@ -43,12 +47,15 @@
             rel="noopener noreferrer"
           >
             <h3 class="text-xl font-semibold mb-2 text-primary-light-500">{post.title}</h3>
+            
             <p class="text-sm text-white/80">{post.description}</p>
           </a>
         </div>
       </div>
+      
       <div class="col-span-2 flex-col flex items-center">
         <div class="text-3xl font-bold mt-8 mb-8 text-center">Youtube</div>
+        
         <div class="relative">
           <iframe
             width="560"
@@ -67,8 +74,10 @@
           </span>
         </div>
       </div>
+      
       <div class="col-span-2 flex-col flex space-y-4 items-center justify-center mb-16">
         <div class="text-3xl font-bold mt-8 mb-8 text-center">Podcasts</div>
+        
         <iframe
           allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
           frameborder="0"

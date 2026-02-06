@@ -39,9 +39,9 @@ defmodule AshHqWeb.Components.DocSidebar do
                 >
                   <span class="hero-chevron-down-solid w-3 h-3" />
                 </div>
-                <span class="text-base-light-500 dark:text-base-dark-300 font-bold">{category}</span>
+                 <span class="text-base-light-500 dark:text-base-dark-300 font-bold">{category}</span>
               </button>
-
+              
               <ul
                 class="ml-4"
                 id={"#{@id}-guides-#{slug(category)}-contents"}
@@ -52,7 +52,7 @@ defmodule AshHqWeb.Components.DocSidebar do
                     <span class="text-primary-dark-500 dark:text-primary-light-500 font-extrabold">
                       {library}
                     </span>
-
+                    
                     <ul>
                       <%= for %{name: item_name, to: to, id: item_id, active?: active?} <- items do %>
                         <% id = id(category, library, item_name, "guides", item_id, @id) %>
@@ -70,8 +70,7 @@ defmodule AshHqWeb.Components.DocSidebar do
                             phx-click={mark_active(id)}
                             class="flex flex-row items-start w-full text-left text-base-light-900 dark:text-base-dark-100"
                           >
-                            <Icon.icon type="Guides" classes="h-4 w-4 flex-none mt-1 mr-1.5" />
-                            {item_name}
+                            <Icon.icon type="Guides" classes="h-4 w-4 flex-none mt-1 mr-1.5" /> {item_name}
                           </.link>
                         </li>
                       <% end %>

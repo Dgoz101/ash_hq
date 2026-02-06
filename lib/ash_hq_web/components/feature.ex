@@ -16,9 +16,11 @@ defmodule AshHqWeb.Components.Feature do
       <div class={classes(["w-16 h-16 text-primary-light-600 dark:text-primary-dark-400", @class])}>
         {render_slot(@icon)}
       </div>
+      
       <div class="font-bold text-3xl mt-4">
         {@name}
       </div>
+      
       <div class="text-xl mt-4">
         {render_slot(@description)}
       </div>

@@ -25,6 +25,42 @@ import { LiveSocket } from "phoenix_live_view";
 
 const Hooks = {};
 
+// Sync docs mobile menu button visual and ARIA state with sidebar container visibility
+// (sidebar is toggled by LiveView JS.toggle/JS.hide; no server assign — client observes DOM)
+Hooks.DocsMobileSidebarStateSync = {
+  mounted() {
+    const container = this.el;
+    const button = document.getElementById("docs-mobile-menu-toggle");
+    if (!button) return;
+    const hamburger = button.querySelector('[data-docs-menu-icon="hamburger"]');
+    const closeIcon = button.querySelector('[data-docs-menu-icon="close"]');
+    if (!hamburger || !closeIcon) return;
+
+    const updateButtonState = () => {
+      const isOpen = !container.classList.contains("hidden");
+      button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      button.setAttribute(
+        "aria-label",
+        isOpen ? "Close documentation menu" : "Open documentation menu",
+      );
+      if (isOpen) {
+        hamburger.classList.add("hidden");
+        closeIcon.classList.remove("hidden");
+      } else {
+        hamburger.classList.remove("hidden");
+        closeIcon.classList.add("hidden");
+      }
+    };
+
+    const observer = new MutationObserver(updateButtonState);
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    updateButtonState();
+  },
+};
+
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");

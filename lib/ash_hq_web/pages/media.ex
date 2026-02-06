@@ -8,6 +8,7 @@ defmodule AshHqWeb.Pages.Media do
       <div class="grid grid-cols-2 gap-4">
         <div class="col-span-2 lg:col-span-1 flex-col flex space-y-4 items-center justify-center">
           <div class="text-3xl font-bold mt-8 mb-8 text-center">Podcasts</div>
+          
           <iframe
             allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
             frameborder="0"
@@ -49,8 +50,10 @@ defmodule AshHqWeb.Pages.Media do
             src="https://embed.podcasts.apple.com/us/podcast/27-ash-framework-with-zach-daniel/id1516100616?i=1000503190100"
           />
         </div>
+        
         <div class="col-span-2 lg:col-span-1 flex-col flex items-center">
           <div class="text-3xl font-bold mt-8 mb-8 text-center">Youtube Playlist</div>
+          
           <iframe
             width="560"
             height="315"
@@ -62,14 +65,16 @@ defmodule AshHqWeb.Pages.Media do
           />
         </div>
       </div>
-
+      
       <div class="text-2xl flex flex-col items-center justify-center text-center mb-16">
         <div class="text-3xl font-bold mt-8 mb-8 text-center">Example Projects</div>
+        
         <%= for %{title: title, href: href, description: description} <- examples() do %>
           <div class="max-w-7xl px-4 sm:px-6 md:px-8 my-8 hidden sm:block">
             <h2 class="mt-8 font-semibold text-red-500 dark:text-red-400">
               <a href={href}>{title}</a>
             </h2>
+            
             <p class="text-base-dark-500 dark:text-base-light-300 mt-4 max-w-3xl space-y-6">
               {Phoenix.HTML.raw(description)}
             </p>

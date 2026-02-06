@@ -44,6 +44,7 @@ defmodule AshHqWeb.Components.Search do
             >
               <span class="hero-x-mark h-6 w-6" aria-hidden="true" />
             </button>
+            
             <div class="flex flex-col w-full sticky">
               <div class="w-full flex flex-row justify-start top-0">
                 <span class="hero-magnifying-glass h-6 w-6 mr-4" />
@@ -67,6 +68,7 @@ defmodule AshHqWeb.Components.Search do
                 </div>
               </div>
             </div>
+            
             <div class="grid overflow-auto scroll-parent">
               {render_items(assigns, @item_list)}
             </div>
@@ -100,23 +102,27 @@ defmodule AshHqWeb.Components.Search do
                 <div>
                   <Icon.icon type={item_type(item)} classes="h-4 w-4 flex-none mt-1 mx-1" />
                 </div>
+                
                 <div class="flex flex-col">
                   <div class="text-primary-light-700 dark:text-primary-dark-300">
                     <span class="text-primary-light-700 dark:text-primary-dark-500">
                       {item.library_name}
                     </span>
-                    {item_type(item)}
+                     {item_type(item)}
                   </div>
+                  
                   <div class="flex flex-row flex-wrap items-center">
                     <div class="font-bold">
                       {item_name(item)}
                     </div>
                   </div>
+                  
                   <div>
                     {first_sentence(item)}
                   </div>
                 </div>
               </div>
+              
               <div></div>
             </div>
           </.link>
@@ -137,23 +143,27 @@ defmodule AshHqWeb.Components.Search do
                 <div>
                   <Icon.icon type={item_type(item)} classes="h-4 w-4 flex-none mt-1 mx-1" />
                 </div>
+                
                 <div class="flex flex-col">
                   <div class="text-primary-light-700 dark:text-primary-dark-300">
                     <span class="text-primary-light-700 dark:text-primary-dark-500">
                       {item.library_name}
                     </span>
-                    {item_type(item)}
+                     {item_type(item)}
                   </div>
+                  
                   <div class="flex flex-row flex-wrap items-center">
                     <div class="font-bold">
                       {item_name(item)}
                     </div>
                   </div>
+                  
                   <div>
                     {first_sentence(item)}
                   </div>
                 </div>
               </div>
+              
               <div></div>
             </div>
           </a>

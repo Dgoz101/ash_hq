@@ -24,6 +24,7 @@ defmodule AshHqWeb.Pages.Forum do
                 <span class="whitespace-nowrap">Discord App</span>
               </div>
             </a>
+            
             <a
               _target="blank"
               href={"https://discord.com/channels/#{711_271_361_523_351_632}/#{@thread.id}"}
@@ -34,6 +35,7 @@ defmodule AshHqWeb.Pages.Forum do
               </div>
             </a>
           </div>
+          
           <head>
             <meta property="og:title" content={@thread.name} />
             <meta
@@ -41,29 +43,33 @@ defmodule AshHqWeb.Pages.Forum do
               content={"See the forum discussion in the #{String.capitalize(@channel.name)} channel"}
             />
           </head>
+          
           <div class="border shadow-sm rounded-lg px-8 pb-6 dark:border-gray-600 mb-4">
             <h2 class="mt-6 text-3xl font-semibold mb-4">{@thread.name}</h2>
+            
             <div class="border-b pb-2">
               <div>
                 {@thread.author}
               </div>
+              
               <div>
                 {@thread.create_timestamp |> DateTime.to_date()}
               </div>
-
+              
               <div class="flex space-x-2">
                 <%= for tag <- @thread.tags do %>
                   <Tag.tag prefix={"/forum/#{@channel.name}"} tag={tag.name} />
                 <% end %>
               </div>
             </div>
+            
             <div class="divide-y divide-solid space-y-6 mt-4">
               <%= for message <- @thread.messages do %>
                 <div class="prose dark:prose-invert break-words">
                   <p>
                     {message.author}:
                   </p>
-                  {Phoenix.HTML.raw(message.content_html)}
+                   {Phoenix.HTML.raw(message.content_html)}
                   <%= for attachment <- message.attachments do %>
                     <Attachment.attachment attachment={attachment} />
                   <% end %>

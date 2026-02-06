@@ -18,12 +18,20 @@ defmodule AshHq.Docs.Dsl do
                  countable: true,
                  default_limit: 25,
                  required?: false
-    end
 
-    create :create do
-      primary? true
-      argument :options, {:array, :map}
-      argument :library_version, :uuid
+      search do
+        doc_attribute :doc
+
+        load_for_search [
+          :extension_module,
+          :library_name
+        ]
+
+        weight_content(0.2)
+
+        sanitized_name_attribute :sanitized_path
+        use_path_for_name? true
+      end
 
       argument :extension_id, :uuid do
         allow_nil? false

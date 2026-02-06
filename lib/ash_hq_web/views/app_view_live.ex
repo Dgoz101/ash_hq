@@ -26,12 +26,12 @@ defmodule AshHqWeb.AppViewLive do
         <meta property="twitter:site" content="@AshFramework" />
         <!-- Need to adjust this for future blog writers -->
         <meta property="twitter:creator" content="@ZachSDaniel1" />
-
         <%= if @live_action not in [:docs_dsl, :blog, :forum] do %>
           <meta property="og:title" content="Ash Framework" />
           <meta property="og:description" content="Model your domain, derive the rest." />
         <% end %>
       </head>
+      
       <.live_component
         module={Search}
         id="search-box"
@@ -41,8 +41,7 @@ defmodule AshHqWeb.AppViewLive do
         change_types="change-types"
         change_versions="change-versions"
         remove_version="remove_version"
-      />
-      <button id="search-button" class="hidden" phx-click={AshHqWeb.AppViewLive.toggle_search()} />
+      /> <button id="search-button" class="hidden" phx-click={AshHqWeb.AppViewLive.toggle_search()} />
       <div
         id="main-container"
         class="w-full min-h-screen bg-white dark:bg-base-dark-850 dark:text-white flex flex-col items-stretch"
@@ -70,7 +69,7 @@ defmodule AshHqWeb.AppViewLive do
           <% :forum -> %>
             <.live_component module={Forum} id="forum" params={@params} />
         <% end %>
-
+        
         <%= if @live_action != :docs_dsl do %>
           <footer class="p-8 sm:p-6 bg-base-light-200 dark:bg-base-dark-850 sm:justify-center sticky">
             <div class="md:flex md:justify-around">
@@ -79,46 +78,55 @@ defmodule AshHqWeb.AppViewLive do
                   <img src="/images/ash-logo-side.svg" class="mr-3 h-32" alt="Ash Framework Logo" />
                 </a>
               </div>
-
+              
               <div class="grid grid-cols-3 gap-8 sm:gap-6">
                 <div>
                   <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
                     Resources
                   </h2>
+                  
                   <ul class="text-gray-600 dark:text-gray-400">
                     <li class="mb-4">
                       <a href="https://github.com/ash-project" class="hover:underline">Source</a>
                     </li>
+                    
                     <li class="mb-4">
                       <a href="/docs/guides/ash/latest/tutorials/get-started" class="hover:underline">
                         Get Started
                       </a>
                     </li>
+                    
                     <li class="mb-4">
                       <a href="/blog" class="hover:underline">Blog</a>
                     </li>
+                    
                     <li>
                       <a href="/media" class="hover:underline">Media</a>
                     </li>
                   </ul>
                 </div>
+                
                 <div>
                   <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
                     Community
                   </h2>
+                  
                   <ul class="text-gray-600 dark:text-gray-400">
                     <li class="mb-4">
                       <a href="https://twitter.com/AshFramework" class="hover:underline">Twitter</a>
                     </li>
+                    
                     <li>
                       <a href="https://discord.gg/D7FNG2q" class="hover:underline">Discord</a>
                     </li>
                   </ul>
                 </div>
+                
                 <div>
                   <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
                     Help Us
                   </h2>
+                  
                   <ul class="text-gray-600 dark:text-gray-400">
                     <li class="mb-4">
                       <a
@@ -128,11 +136,13 @@ defmodule AshHqWeb.AppViewLive do
                         Report an issue
                       </a>
                     </li>
+                    
                     <li class="mb-4">
                       <a href="https://ash-hq.appsignal-status.com" class="hover:underline">
                         Status Page
                       </a>
                     </li>
+                    
                     <li>
                       <a href="/docs/guides/ash/latest/how_to/contribute" class="hover:underline">
                         Contribute

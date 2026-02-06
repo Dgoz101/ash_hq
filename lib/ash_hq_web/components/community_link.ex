@@ -17,6 +17,7 @@ defmodule AshHqWeb.Components.CommunityLink do
       <div class={classes(["w-16 h-16 text-primary-light-600 dark:text-primary-dark-400", @class])}>
         {render_slot(@icon)}
       </div>
+      
       <a
         href={@url}
         class="font-bold text-3xl mt-4 hover:underline flex flex-row items-center space-x-2"
@@ -37,6 +38,7 @@ defmodule AshHqWeb.Components.CommunityLink do
           />
         </svg>
       </a>
+      
       <div class="text-xl mt-4">
         {render_slot(@description)}
       </div>

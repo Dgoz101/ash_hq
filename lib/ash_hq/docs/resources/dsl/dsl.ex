@@ -4,7 +4,8 @@ defmodule AshHq.Docs.Dsl do
   use Ash.Resource,
     domain: AshHq.Docs,
     data_layer: AshPostgres.DataLayer,
-    extensions: [AshHq.Docs.Extensions.Search, AshHq.Docs.Extensions.RenderMarkdown]
+    extensions: [AshHq.Docs.Extensions.Search, AshHq.Docs.Extensions.RenderMarkdown],
+    primary_read_warning?: false
 
   actions do
     default_accept :*
@@ -36,9 +37,19 @@ defmodule AshHq.Docs.Dsl do
       argument :extension_id, :uuid do
         allow_nil? false
       end
+    end
+
+    create :create do
+      primary? true
+
+      argument :extension_id, :uuid do
+        allow_nil? false
+      end
+
+      argument :library_version, :uuid
+      argument :options, {:array, :map}
 
       change {AshHq.Docs.Changes.AddArgToRelationship, arg: :extension_id, rel: :options}
-
       change {AshHq.Docs.Changes.AddArgToRelationship, arg: :library_version, rel: :options}
       change manage_relationship(:options, type: :direct_control)
       change manage_relationship(:library_version, type: :append_and_remove)

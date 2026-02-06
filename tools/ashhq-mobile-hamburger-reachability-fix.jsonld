@@ -1,0 +1,78 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-mobile-hamburger-reachability-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-mobile-hamburger-reachability-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqMobileHamburgerReachabilityFixTool",
+      "@type": "Tool",
+      "name": "ashhq-mobile-hamburger-reachability-fix",
+      "purpose": "Developer workflow tool for improving mobile usability and ergonomics in a Phoenix LiveView application. The immediate task: the hamburger (menu) icon is positioned on the left side of the screen at mobile widths, which is harder to use for a large portion of users (right-handed, one-handed use with thumb in lower-right area). The tool analyzes the mobile header/navigation layout (where the hamburger is rendered, structure, breakpoints), analyzes ergonomics and interaction patterns (menu position, other header elements, sticky/fixed behavior), reproduces the usability issue with exact steps and one-handed usage scenario, proposes (but does not apply unless approved) one or more fixes that improve reachability while preserving design intent and accessibility, and verifies conceptually that thumb reach, desktop/tablet layout, keyboard navigation, screen reader semantics, and touch target size remain intact.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-mobile-hamburger-reachability-fix', 'fix mobile hamburger reachability', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": ["ashhq:MobileHamburgerReachabilityAnalyst"],
+      "constraints": [
+        "Do not significantly change visible layout intent outside of mobile",
+        "Do not break keyboard navigation or accessibility semantics",
+        "Do not edit repository code unless user explicitly types APPROVE APPLY",
+        "Prefer minimal, localized changes (mobile breakpoint–specific)",
+        "Output must be explainable and reviewable as a pull request",
+        "User may commit and push to their fork; do not open upstream PR",
+        "Propose only at this stage; no repo edits until explicit approval"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-mobile-hamburger-reachability-fix.jsonld",
+        "runbook": "docs/ashhq-mobile-hamburger-reachability-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "targetArea": "Mobile header / navigation where the hamburger menu is rendered (docs page mobile bar)",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "applyBehavior": "PROPOSE ONLY. No repository edits allowed until user explicitly types APPROVE APPLY.",
+      "firstUseCase": "ash_hq docs: hamburger menu on left at mobile widths; right-handed one-handed users find it at furthest ergonomic distance; tool analyzes layout and ergonomics, reproduces issue, proposes move-to-right or duplicate-on-right or thumb-reachable alternative, verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Analyze layout → Analyze ergonomics → Reproduce → Propose → Verify (one actor, five phased responsibilities)",
+      "contains": ["ashhq:MobileHamburgerReachabilityAnalyst"]
+    },
+    {
+      "@id": "ashhq:MobileHamburgerReachabilityAnalyst",
+      "@type": "Actor",
+      "name": "MobileHamburgerReachabilityAnalyst",
+      "responsibilities": [
+        "Phase 1 — Analyze layout: Analyze the mobile header/navigation layout. Identify where the hamburger/menu button is rendered (LiveView, HEEx, components). Identify how the mobile header is structured (flex/grid, alignment, breakpoints). Identify which breakpoints define 'mobile' behavior (e.g. xl:hidden, xl:block). Produce a layout summary: file path(s), component/template names, header structure, and breakpoint values.",
+        "Phase 2 — Analyze ergonomics: Confirm that the menu icon is positioned on the left at mobile widths. Identify other interactive elements in the mobile header (logo, search, actions). Note whether the header is sticky/fixed and how that affects reachability. Document the one-handed usage scenario (right-handed thumb in lower-right area; left-side menu at furthest ergonomic distance).",
+        "Phase 3 — Reproduce: Document exact reproduction steps: URL/route, viewport width or device preset. Describe the one-handed usage scenario (right-handed thumb reach). Compare expected vs actual ease of access to the menu button.",
+        "Phase 4 — Propose: Propose (but do NOT apply yet) one or more fixes that improve reachability while preserving design intent. Preferred: move the hamburger/menu button to the right side at mobile breakpoints. Alternative: duplicate the menu button on the right for mobile only. Alternative: move primary navigation access to a bottom-aligned or thumb-reachable area if consistent with design. Ensure the visual hierarchy and branding (logo placement, header balance) remain intentional. Document fix options with tradeoffs. Do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 5 — Verify: Verify conceptually (no code edits yet) that: (1) menu button is reachable with a right-hand thumb in one-handed use, (2) no regressions to desktop or tablet layouts, (3) keyboard navigation and focus order remain logical, (4) screen reader semantics and accessible names for the menu button remain intact, (5) touch target size and spacing remain accessible. Produce a short verification checklist and any caveats."
+      ],
+      "receivesFrom": ["ashhq:AshHqMobileHamburgerReachabilityFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq, target area mobile header / docs navigation",
+      "outputPayload": {
+        "layoutSummary": "object (hamburger render location, mobile header structure, flex/grid/alignment, breakpoints, file paths, component names)",
+        "ergonomicsSummary": "object (menu position at mobile, other header elements, sticky/fixed, one-handed scenario description)",
+        "reproduction": "object (URL/route, viewport width or device preset, reproduction steps, expected vs actual ease of access)",
+        "proposal": "object (fix options with tradeoffs, preferred option, file-level changes, snippets; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 5",
+      "criteria": [
+        "Menu button is reachable with a right-hand thumb in one-handed use",
+        "No regressions to desktop or tablet layouts",
+        "Keyboard navigation and focus order remain logical",
+        "Screen reader semantics and accessible names for the menu button remain intact",
+        "Touch target size and spacing remain accessible (e.g. minimum 44x44px)"
+      ]
+    }
+  ]
+}

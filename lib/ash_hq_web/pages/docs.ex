@@ -63,6 +63,7 @@ defmodule AshHqWeb.Pages.Docs do
         <div
           :if={@not_found}
           id="docs-window"
+          phx-hook="DocsScrollReset"
           class="xl:order-2 w-full shrink max-w-6xl prose prose-td:pl-0 bg-white dark:bg-base-dark-850 dark:prose-invert md:pr-8 md:mt-4 px-4 md:px-auto mx-auto overflow-x-auto overflow-y-hidden"
         >
           <div class="w-full nav-anchor text-black dark:text-white relative py-4 md:py-auto">
@@ -80,6 +81,7 @@ defmodule AshHqWeb.Pages.Docs do
         <div
           :if={!@not_found}
           id="docs-window"
+          phx-hook="DocsScrollReset"
           class={
             classes([
               "xl:order-2 w-full shrink max-w-6xl bg-white dark:bg-base-dark-850 md:pr-8 md:mt-4 px-4 md:px-auto mx-auto overflow-x-auto overflow-y-hidden prose prose-td:pl-0 dark:prose-invert"

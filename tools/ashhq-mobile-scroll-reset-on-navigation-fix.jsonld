@@ -1,0 +1,89 @@
+{
+  "@context": {
+    "@vocab": "https://aalang.dev/ashhq-mobile-scroll-reset-on-navigation-fix/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "ashhq": "https://aalang.dev/ashhq-mobile-scroll-reset-on-navigation-fix/"
+  },
+  "@graph": [
+    {
+      "@id": "ashhq:AshHqMobileScrollResetOnNavigationFixTool",
+      "@type": "Tool",
+      "name": "ashhq-mobile-scroll-reset-on-navigation-fix",
+      "purpose": "Developer workflow tool for improving mobile navigation behavior on documentation pages in a Phoenix LiveView application. The immediate task: when navigating to a new documentation section (e.g. clicking a link in the docs sidebar or function list), the scroll position does NOT reset to the top; on mobile, users land partway down the page, which is disorienting. The tool (1) analyzes how navigation between docs sections works on mobile (how section navigation is triggered — LiveView patch, push_patch, push_navigate, anchor links, or JS; whether navigation reuses the same LiveView or swaps content inside an existing scroll container), (2) identifies the active scroll container on mobile (document/body vs nested overflow-y-auto container; the DOM element whose scroll position persists across navigation), (3) reproduces the issue with exact steps (docs route, mobile viewport, navigate from one section to another while scrolled down; observe new section loads but scroll remains at previous offset), (4) proposes (but does NOT apply) one or more fixes that reset scroll position on navigation (preferred: reset on LiveView navigation events; alternatives: reset when main content container changes, or move scroll to document/body if appropriate; ensure solution works on mobile and does not negatively affect desktop), and (5) verifies conceptually that on mobile navigating to a new section always starts at the top, with no regressions to back/forward, keyboard navigation, accessibility, or layout shifts.",
+      "trigger": "User or Cursor Agent invokes the tool (e.g. 'run ashhq-mobile-scroll-reset-on-navigation-fix', 'fix mobile docs scroll reset', or loading this spec).",
+      "invoker": "User or Cursor Agent",
+      "mode": "ashhq:ExecutionMode",
+      "actors": ["ashhq:MobileScrollResetAnalyst"],
+      "constraints": [
+        "Do not significantly change visible layout intent",
+        "Do not break keyboard navigation or accessibility semantics",
+        "Do not edit repository code unless user explicitly types APPROVE APPLY",
+        "Prefer minimal, localized changes",
+        "Output must be explainable and reviewable as a pull request",
+        "Propose only at this stage; no repo edits until explicit approval",
+        "User may commit and push to their fork; do not open upstream PR"
+      ],
+      "artifactPaths": {
+        "toolSpec": "tools/ashhq-mobile-scroll-reset-on-navigation-fix.jsonld",
+        "runbook": "docs/ashhq-mobile-scroll-reset-on-navigation-fix-runbook.md"
+      },
+      "targetRepo": "ash_hq",
+      "targetArea": "Mobile docs navigation (sidebar links, function list, or in-page navigation)",
+      "environment": "Windows, Docker + local Phoenix server, Cursor Agent mode",
+      "applyBehavior": "PROPOSE ONLY. No repository edits allowed until user explicitly types APPROVE APPLY.",
+      "firstUseCase": "ash_hq docs: on mobile, navigating to a new section does not reset scroll; tool analyzes navigation and scroll container, reproduces, proposes reset-on-navigation fix(s), verifies conceptually."
+    },
+    {
+      "@id": "ashhq:ExecutionMode",
+      "@type": "Mode",
+      "purpose": "Single pipeline execution: Analyze navigation → Identify scroll container → Reproduce → Propose → Verify (one actor, five phased responsibilities)",
+      "contains": ["ashhq:MobileScrollResetAnalyst"]
+    },
+    {
+      "@id": "ashhq:MobileScrollResetAnalyst",
+      "@type": "Actor",
+      "name": "MobileScrollResetAnalyst",
+      "responsibilities": [
+        "Phase 1 — Analyze navigation: Identify how section navigation is triggered on mobile (LiveView patch, push_patch, push_navigate, anchor links, or JS). Identify whether navigation reuses the same LiveView or swaps content inside an existing scroll container. Identify routes/LiveViews that render docs (e.g. docs_dsl live action, Docs LiveComponent, DocSidebar). Produce a navigation and layout summary.",
+        "Phase 2 — Identify scroll container: Determine whether scrolling on mobile occurs on the document/body or on a nested container (e.g. div with overflow-y-auto). Identify the DOM element whose scroll position persists across navigation. Use layout/CSS (overflow, height, flex/grid) and optionally browser DevTools to confirm. Record file paths, selectors, and scroll context.",
+        "Phase 3 — Reproduce: Document exact reproduction steps: docs route (e.g. /docs/guides/ash/latest/...), mobile viewport width or device preset. Navigate from one section to another while scrolled down. Observe that the new section loads but the scroll position remains at the previous offset instead of resetting to the top. Record expected vs actual (expected: new section starts at top; actual: scroll position preserved).",
+        "Phase 4 — Propose: Propose (but do NOT apply yet) one or more fixes that reset scroll position on navigation. Preferred: reset scroll to top on LiveView navigation events (e.g. on patch or navigate). Alternative: reset scroll when the main content container changes. Alternative: move scroll responsibility to the document/body if appropriate (single scroll context). Ensure the solution works on mobile and does not negatively affect desktop behavior. Document fix options with tradeoffs; do not edit repo files unless user explicitly types APPROVE APPLY.",
+        "Phase 5 — Verify: Verify conceptually (no code edits yet): (1) on mobile, navigating to a new section always starts at the top of the content; (2) no regressions to back/forward navigation; (3) keyboard navigation and accessibility semantics remain intact; (4) no layout shifts or visual jank are introduced. Produce a short verification checklist and any caveats."
+      ],
+      "receivesFrom": ["ashhq:AshHqMobileScrollResetOnNavigationFixTool", "Invoker"],
+      "sendsTo": ["Invoker"],
+      "input": "Trigger + repo path (e.g. workspace root), target repo ash_hq, target area mobile docs navigation",
+      "outputPayload": {
+        "navigationSummary": "object (how section navigation is triggered, same LiveView vs content swap, routes/LiveViews)",
+        "scrollContainerLocation": "object (document vs nested container, DOM element that persists scroll, file paths, selectors)",
+        "reproduction": "object (docs route, mobile viewport, exact steps, expected vs actual)",
+        "proposal": "object (fix options with tradeoffs, preferred and alternatives, file-level/snippet-level changes; no edits applied)",
+        "verificationChecklist": "array of { criterion, passed, notes }"
+      }
+    },
+    {
+      "@id": "ashhq:ProposalRequirements",
+      "@type": "Requirement",
+      "purpose": "Requirements for proposed fixes",
+      "requirements": [
+        "Preferred: reset scroll to top on LiveView navigation events (e.g. on patch or navigate)",
+        "Alternative: reset scroll when the main content container changes",
+        "Alternative: move scroll responsibility to document/body if appropriate (single scroll context)",
+        "Solution must work on mobile and not negatively affect desktop behavior",
+        "Minimal, localized changes; explainable as a pull request"
+      ]
+    },
+    {
+      "@id": "ashhq:VerificationCriteria",
+      "@type": "Requirement",
+      "purpose": "Criteria the Analyst must verify conceptually in Phase 5",
+      "criteria": [
+        "On mobile, navigating to a new section always starts at the top of the content",
+        "No regressions to back/forward navigation",
+        "Keyboard navigation and accessibility semantics remain intact",
+        "No layout shifts or visual jank are introduced"
+      ]
+    }
+  ]
+}

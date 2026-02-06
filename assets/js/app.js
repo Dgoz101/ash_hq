@@ -61,6 +61,28 @@ Hooks.DocsMobileSidebarStateSync = {
   },
 };
 
+// Reset docs scroll to top on intentional navigation (sidebar/function list), not on back/forward
+window.addEventListener("popstate", () => {
+  window.__skipNextDocsScrollReset = true;
+});
+
+Hooks.DocsScrollReset = {
+  mounted() {
+    const nav = performance.getEntriesByType?.("navigation")?.[0];
+    const type = nav?.type;
+    if (type === "navigate") {
+      window.scrollTo(0, 0);
+    }
+  },
+  updated() {
+    if (window.__skipNextDocsScrollReset) {
+      window.__skipNextDocsScrollReset = false;
+      return;
+    }
+    window.scrollTo(0, 0);
+  },
+};
+
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
